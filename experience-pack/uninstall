@@ -11,16 +11,27 @@ cycle_command="$HOME/.local/bin/omarchy-theme-cycle-dreamscapes"
 
 if [[ -f $shell_config ]] && command -v jq >/dev/null; then
   shell_tmp=$(mktemp)
-  jq 'walk(if type == "object" and .id? == "dreamscapes.workspaces" then .id = "omarchy.workspaces" else . end)' "$shell_config" > "$shell_tmp"
+  jq -a 'walk(if type == "object" and .id? == "dreamscapes.workspaces" then .id = "omarchy.workspaces" else . end)' "$shell_config" > "$shell_tmp"
   install -m 644 "$shell_tmp" "$shell_config"
   rm -f "$shell_tmp"
 fi
 
 if [[ -f $bindings ]]; then
-  bindings_tmp=$(mktemp)
-  sed '/# BEGIN OMARCHY DREAMSCAPES/,/# END OMARCHY DREAMSCAPES/d' "$bindings" > "$bindings_tmp"
-  install -m 644 "$bindings_tmp" "$bindings"
-  rm -f "$bindings_tmp"
+  begin=$(grep -n '# BEGIN OMARCHY DREAMSCAPES' "$bindings" | head -1 | cut -d: -f1)
+  end=$(grep -n '# END OMARCHY DREAMSCAPES' "$bindings" | head -1 | cut -d: -f1)
+
+  if [[ -n $begin && -n $end && $begin -le $end ]]; then
+    # The installer writes a blank separator line before the block; take it too
+    # so removal restores the file exactly as it was.
+    if [[ $begin -gt 1 && -z $(sed -n "$((begin - 1))p" "$bindings") ]]; then
+      begin=$((begin - 1))
+    fi
+
+    bindings_tmp=$(mktemp)
+    sed "${begin},${end}d" "$bindings" > "$bindings_tmp"
+    install -m 644 "$bindings_tmp" "$bindings"
+    rm -f "$bindings_tmp"
+  fi
 fi
 
 rm -rf -- "$plugin_dir"
