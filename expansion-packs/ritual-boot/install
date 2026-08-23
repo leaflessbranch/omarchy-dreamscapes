@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -euo pipefail
+
+pack_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+backup_dir="$HOME/.local/state/omarchy-dreamscapes/backups/$(date +%Y%m%d-%H%M%S)-ritual-boot"
+backup_pointer="$HOME/.local/state/omarchy-dreamscapes/ritual.backup"
+theme_root="$HOME/.config/omarchy/themes"
+
+mkdir -p "$backup_dir" "$HOME/.local/bin" "$(dirname "$backup_pointer")"
+install -m 755 "$pack_dir/bin/dreamscapes-ritual" "$HOME/.local/bin/dreamscapes-ritual"
+
+for assets in "$pack_dir"/assets/*; do
+  [[ -d $assets ]] || continue
+  theme=${assets##*/}
+  target="$theme_root/$theme"
+  [[ -d $target ]] || continue
+  mkdir -p "$backup_dir/$theme"
+  [[ -f $target/unlock.png ]] && cp "$target/unlock.png" "$backup_dir/$theme/unlock.png"
+  [[ -f $target/preview-unlock.png ]] && cp "$target/preview-unlock.png" "$backup_dir/$theme/preview-unlock.png"
+  install -m 644 "$assets/unlock.png" "$target/unlock.png"
+  install -m 644 "$assets/preview-unlock.png" "$target/preview-unlock.png"
+done
+
+printf '%s\n' "$backup_dir" > "$backup_pointer"
+echo "Ritual Boot assets installed."
+echo "Preview with: dreamscapes-ritual preview"
+echo "Apply explicitly with: dreamscapes-ritual apply"
+echo "Backups: $backup_dir"

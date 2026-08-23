@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -euo pipefail
+
+pack_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+command_path="$HOME/.local/bin/dreamscapes-kinetic"
+
+command -v omarchy >/dev/null || { echo "Omarchy is required." >&2; exit 1; }
+mkdir -p "$(dirname "$command_path")"
+install -m 755 "$pack_dir/bin/dreamscapes-kinetic" "$command_path"
+omarchy hook install theme-set "$pack_dir/hooks/theme-set.d/kinetic-architecture"
+omarchy hook install post-boot "$pack_dir/hooks/post-boot.d/kinetic-architecture"
+"$command_path" apply
+
+echo "Kinetic Architecture Pack installed."

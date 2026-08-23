@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -euo pipefail
+
+command_path="$HOME/.local/bin/dreamscapes-kinetic"
+[[ -x $command_path ]] && "$command_path" restore >/dev/null || true
+rm -f -- "$command_path" \
+  "$HOME/.config/omarchy/hooks/theme-set.d/kinetic-architecture" \
+  "$HOME/.config/omarchy/hooks/post-boot.d/kinetic-architecture"
+
+echo "Kinetic Architecture Pack removed."

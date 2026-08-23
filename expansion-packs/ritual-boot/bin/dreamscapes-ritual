@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -euo pipefail
+
+theme_file="$HOME/.local/state/omarchy/current/theme.name"
+theme_root="$HOME/.config/omarchy/themes"
+
+current_theme() {
+  [[ -f $theme_file ]] || { echo "No active Omarchy theme." >&2; return 1; }
+  cat "$theme_file"
+}
+
+preview() {
+  local theme=${1:-$(current_theme)}
+  local output=${2:-"/tmp/${theme}-plymouth-preview.png"}
+  local dir="$theme_root/$theme"
+  [[ -f $dir/colors.toml && -f $dir/unlock.png ]] || { echo "Ritual assets not found for $theme" >&2; return 1; }
+  local background foreground
+  background=$(awk -F= '$1 ~ /^[[:space:]]*background[[:space:]]*$/ { gsub(/[ "\r]/, "", $2); print $2; exit }' "$dir/colors.toml")
+  foreground=$(awk -F= '$1 ~ /^[[:space:]]*foreground[[:space:]]*$/ { gsub(/[ "\r]/, "", $2); print $2; exit }' "$dir/colors.toml")
+  omarchy plymouth preview "$background" "$foreground" "$dir/unlock.png" "$output"
+  echo "$output"
+}
+
+case "${1:-status}" in
+  apply) omarchy plymouth set by theme "${2:-$(current_theme)}" ;;
+  preview) preview "${2:-}" "${3:-}" ;;
+  status) omarchy plymouth current ;;
+  *) echo "Usage: dreamscapes-ritual {status|preview [theme] [output]|apply [theme]}" >&2; exit 1 ;;
+esac

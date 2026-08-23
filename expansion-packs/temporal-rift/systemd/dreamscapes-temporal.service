@@ -1,0 +1,6 @@
+[Unit]
+Description=Apply the current Omarchy Dreamscapes temporal phase
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/dreamscapes-temporal apply auto

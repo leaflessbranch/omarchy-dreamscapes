@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -euo pipefail
+
+theme_file="$HOME/.local/state/omarchy/current/theme.name"
+theme_dir="$HOME/.local/state/omarchy/current/theme"
+logo_root="$HOME/.local/share/omarchy-dreamscapes/dream-terminal/logos"
+
+command -v fastfetch >/dev/null || { echo "fastfetch is required." >&2; exit 1; }
+theme=unknown
+[[ -f $theme_file ]] && theme=$(<"$theme_file")
+logo="$logo_root/$theme.txt"
+[[ -f $logo ]] || logo="$logo_root/dreamscapes.txt"
+
+accent=cyan
+if [[ -f $theme_dir/colors.toml ]]; then
+  parsed=$(awk -F= '$1 ~ /^[[:space:]]*accent[[:space:]]*$/ { gsub(/[ "\r]/, "", $2); print $2; exit }' "$theme_dir/colors.toml")
+  [[ -n $parsed ]] && accent=$parsed
+fi
+
+fastfetch --file "$logo" --logo-color-1 "$accent" \
+  --structure Title:Separator:OS:Host:Kernel:Uptime:Packages:Shell:Display:WM:Terminal:CPU:GPU:Memory:Disk:Battery:Break:Colors

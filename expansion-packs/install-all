@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -euo pipefail
+
+packs_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+
+"$packs_dir/temporal-rift/install"
+"$packs_dir/kinetic-architecture/install"
+"$packs_dir/dreamscapes-hud/install"
+"$packs_dir/dream-terminal/install"
+"$packs_dir/ritual-boot/install"
+
+echo "All five Dreamscapes expansion packs are installed."

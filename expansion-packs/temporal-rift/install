@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -euo pipefail
+
+pack_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+share_dir="$HOME/.local/share/omarchy-dreamscapes/temporal-rift"
+state_dir="$HOME/.local/state/omarchy-dreamscapes"
+unit_dir="$HOME/.config/systemd/user"
+command_path="$HOME/.local/bin/dreamscapes-temporal"
+current_background="$HOME/.local/state/omarchy/current/background"
+
+command -v omarchy >/dev/null || { echo "Omarchy is required." >&2; exit 1; }
+command -v systemctl >/dev/null || { echo "systemd is required." >&2; exit 1; }
+
+mkdir -p "$share_dir" "$state_dir" "$unit_dir" "$(dirname "$command_path")"
+if [[ -L $current_background ]] && [[ ! -f $state_dir/temporal.previous-background ]]; then
+  readlink -f "$current_background" > "$state_dir/temporal.previous-background"
+fi
+
+cp -R "$pack_dir/backgrounds" "$share_dir/"
+install -m 755 "$pack_dir/bin/dreamscapes-temporal" "$command_path"
+install -m 644 "$pack_dir/systemd/dreamscapes-temporal.service" "$unit_dir/dreamscapes-temporal.service"
+install -m 644 "$pack_dir/systemd/dreamscapes-temporal.timer" "$unit_dir/dreamscapes-temporal.timer"
+omarchy hook install theme-set "$pack_dir/hooks/theme-set.d/temporal-rift"
+omarchy hook install post-boot "$pack_dir/hooks/post-boot.d/temporal-rift"
+
+systemctl --user daemon-reload
+systemctl --user enable --now dreamscapes-temporal.timer
+"$command_path" apply auto
+
+echo "Temporal Rift Pack installed."

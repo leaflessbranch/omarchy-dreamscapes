@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -euo pipefail
+
+packs_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+
+"$packs_dir/ritual-boot/uninstall"
+"$packs_dir/dream-terminal/uninstall"
+"$packs_dir/dreamscapes-hud/uninstall"
+"$packs_dir/kinetic-architecture/uninstall"
+"$packs_dir/temporal-rift/uninstall"
+
+echo "All five Dreamscapes expansion packs are removed."

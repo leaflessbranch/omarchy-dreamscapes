@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -euo pipefail
+
+starship_config="$HOME/.config/starship.toml"
+if [[ -f $starship_config ]]; then
+  temporary=$(mktemp)
+  sed '/# BEGIN OMARCHY DREAMSCAPES TERMINAL/,/# END OMARCHY DREAMSCAPES TERMINAL/d' "$starship_config" > "$temporary"
+  install -m 644 "$temporary" "$starship_config"
+  rm -f "$temporary"
+fi
+
+rm -rf -- "$HOME/.local/share/omarchy-dreamscapes/dream-terminal"
+rm -f -- "$HOME/.local/bin/dreamfetch" "$HOME/.local/bin/dreamscapes-prompt"
+
+echo "Dream Terminal Pack removed. Backups were retained."

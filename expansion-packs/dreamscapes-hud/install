@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -euo pipefail
+
+pack_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+plugin_dir="$HOME/.config/omarchy/plugins/dreamscapes.hud"
+
+command -v omarchy >/dev/null || { echo "Omarchy is required." >&2; exit 1; }
+mkdir -p "$plugin_dir"
+cp "$pack_dir/plugins/dreamscapes.hud/manifest.json" "$plugin_dir/manifest.json"
+cp "$pack_dir/plugins/dreamscapes.hud/Hud.qml" "$plugin_dir/Hud.qml"
+
+omarchy plugin validate "$plugin_dir"
+omarchy-shell shell rescanPlugins
+omarchy plugin enable dreamscapes.hud --section left --index 2
+
+echo "Dreamscapes HUD Pack installed."

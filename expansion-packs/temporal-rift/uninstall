@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -euo pipefail
+
+state_dir="$HOME/.local/state/omarchy-dreamscapes"
+previous_background="$state_dir/temporal.previous-background"
+
+systemctl --user disable --now dreamscapes-temporal.timer >/dev/null 2>&1 || true
+if [[ -f $previous_background ]]; then
+  background=$(<"$previous_background")
+  [[ -f $background ]] && omarchy theme bg set "$background" >/dev/null || true
+fi
+command -v hyprctl >/dev/null 2>&1 && hyprctl hyprsunset identity >/dev/null 2>&1 || true
+
+rm -rf -- "$HOME/.local/share/omarchy-dreamscapes/temporal-rift"
+rm -f -- "$HOME/.local/bin/dreamscapes-temporal" \
+  "$HOME/.config/systemd/user/dreamscapes-temporal.service" \
+  "$HOME/.config/systemd/user/dreamscapes-temporal.timer" \
+  "$HOME/.config/omarchy/hooks/theme-set.d/temporal-rift" \
+  "$HOME/.config/omarchy/hooks/post-boot.d/temporal-rift" \
+  "$state_dir/temporal.phase" "$previous_background"
+systemctl --user daemon-reload
+
+echo "Temporal Rift Pack removed."

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -euo pipefail
+
+backup_pointer="$HOME/.local/state/omarchy-dreamscapes/ritual.backup"
+theme_root="$HOME/.config/omarchy/themes"
+if [[ -f $backup_pointer ]]; then
+  backup_dir=$(<"$backup_pointer")
+  if [[ -d $backup_dir ]]; then
+    for assets in "$backup_dir"/*; do
+      [[ -d $assets ]] || continue
+      theme=${assets##*/}
+      target="$theme_root/$theme"
+      [[ -d $target ]] || continue
+      [[ -f $assets/unlock.png ]] && install -m 644 "$assets/unlock.png" "$target/unlock.png"
+      [[ -f $assets/preview-unlock.png ]] && install -m 644 "$assets/preview-unlock.png" "$target/preview-unlock.png"
+    done
+  fi
+fi
+
+rm -f -- "$HOME/.local/bin/dreamscapes-ritual" "$backup_pointer"
+echo "Ritual Boot user assets restored. The current system Plymouth theme was not changed."

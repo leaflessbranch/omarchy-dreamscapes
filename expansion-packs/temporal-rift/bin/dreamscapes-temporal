@@ -1,0 +1,115 @@
+#!/bin/bash
+
+set -euo pipefail
+
+state_dir="$HOME/.local/state/omarchy-dreamscapes"
+asset_root="$HOME/.local/share/omarchy-dreamscapes/temporal-rift/backgrounds"
+theme_file="$HOME/.local/state/omarchy/current/theme.name"
+phase_file="$state_dir/temporal.phase"
+
+themes=(
+  abyssal-cartographer
+  xenobotany-lab-no-7
+  solar-relic
+  dream-bureaucracy
+  cathedral-of-static
+  cryogenic-orchard
+  apollo-after-dark
+  living-ink
+  neon-fossil
+  the-impossible-hotel
+)
+
+supported_theme() {
+  local candidate=$1
+  local item
+  for item in "${themes[@]}"; do
+    [[ $item == "$candidate" ]] && return 0
+  done
+  return 1
+}
+
+phase_for_hour() {
+  local hour=${1:-${DREAMSCAPES_HOUR:-$(date +%H)}}
+  hour=$((10#$hour))
+  if (( hour >= 5 && hour <= 8 )); then
+    echo dawn
+  elif (( hour >= 9 && hour <= 16 )); then
+    echo day
+  elif (( hour >= 17 && hour <= 20 )); then
+    echo dusk
+  else
+    echo midnight
+  fi
+}
+
+temperature_for_phase() {
+  case "$1" in
+    dawn) echo 5200 ;;
+    day) echo identity ;;
+    dusk) echo 4600 ;;
+    midnight) echo 3800 ;;
+    *) return 1 ;;
+  esac
+}
+
+apply_phase() {
+  local requested=${1:-auto}
+  local theme phase background temperature
+  [[ -f $theme_file ]] || { echo "No active Omarchy theme." >&2; return 1; }
+  theme=$(<"$theme_file")
+  supported_theme "$theme" || { echo "Temporal Rift is inactive for theme: $theme"; return 0; }
+
+  if [[ $requested == auto ]]; then
+    phase=$(phase_for_hour)
+  else
+    phase=$requested
+    temperature_for_phase "$phase" >/dev/null || { echo "Unknown phase: $phase" >&2; return 1; }
+  fi
+
+  background="$asset_root/$theme/$phase.webp"
+  [[ -f $background ]] || { echo "Missing temporal background: $background" >&2; return 1; }
+
+  mkdir -p "$state_dir"
+  omarchy theme bg set "$background"
+  printf '%s\n' "$phase" > "$phase_file"
+
+  temperature=$(temperature_for_phase "$phase")
+  if command -v hyprctl >/dev/null 2>&1; then
+    if [[ $temperature == identity ]]; then
+      hyprctl hyprsunset identity >/dev/null 2>&1 || true
+    else
+      hyprctl hyprsunset temperature "$temperature" >/dev/null 2>&1 || true
+    fi
+  fi
+
+  echo "$theme · $phase"
+}
+
+cycle_phase() {
+  local current=midnight next=dawn
+  [[ -f $phase_file ]] && current=$(<"$phase_file")
+  case "$current" in
+    dawn) next=day ;;
+    day) next=dusk ;;
+    dusk) next=midnight ;;
+    midnight) next=dawn ;;
+  esac
+  apply_phase "$next"
+}
+
+status() {
+  local theme=unknown phase
+  [[ -f $theme_file ]] && theme=$(<"$theme_file")
+  phase=$(phase_for_hour)
+  [[ -f $phase_file ]] && phase=$(<"$phase_file")
+  echo "$theme · $phase"
+}
+
+case "${1:-status}" in
+  phase) phase_for_hour "${2:-}" ;;
+  apply) apply_phase "${2:-auto}" ;;
+  cycle) cycle_phase ;;
+  status) status ;;
+  *) echo "Usage: dreamscapes-temporal {status|phase [hour]|apply [auto|dawn|day|dusk|midnight]|cycle}" >&2; exit 1 ;;
+esac

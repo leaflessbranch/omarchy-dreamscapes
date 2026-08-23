@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -euo pipefail
+
+pack_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+share_dir="$HOME/.local/share/omarchy-dreamscapes/dream-terminal"
+bin_dir="$HOME/.local/bin"
+starship_config="$HOME/.config/starship.toml"
+backup_dir="$HOME/.local/state/omarchy-dreamscapes/backups/$(date +%Y%m%d-%H%M%S)-dream-terminal"
+
+command -v fastfetch >/dev/null || { echo "fastfetch is required." >&2; exit 1; }
+mkdir -p "$share_dir" "$bin_dir" "$(dirname "$starship_config")" "$backup_dir"
+cp -R "$pack_dir/logos" "$share_dir/"
+install -m 755 "$pack_dir/bin/dreamfetch" "$bin_dir/dreamfetch"
+install -m 755 "$pack_dir/bin/dreamscapes-prompt" "$bin_dir/dreamscapes-prompt"
+
+if [[ -f $starship_config ]]; then
+  cp "$starship_config" "$backup_dir/starship.toml"
+else
+  : > "$starship_config"
+fi
+
+if ! grep -Fq '# BEGIN OMARCHY DREAMSCAPES TERMINAL' "$starship_config"; then
+  printf '\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' \
+    '# BEGIN OMARCHY DREAMSCAPES TERMINAL' \
+    '[custom.dreamscapes]' \
+    'command = "dreamscapes-prompt"' \
+    'when = true' \
+    'format = "[$output]($style) "' \
+    'style = "bold cyan"' \
+    '# END OMARCHY DREAMSCAPES TERMINAL' >> "$starship_config"
+fi
+
+echo "Dream Terminal Pack installed. Run: dreamfetch"
+echo "Backups: $backup_dir"

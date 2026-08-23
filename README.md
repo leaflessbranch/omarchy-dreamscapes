@@ -77,6 +77,32 @@ The themes are complete without this. The opt-in [Experience Pack](experience-pa
 
 Its installer backs up every user configuration file it changes and its uninstaller removes only Dreamscapes-owned files.
 
+## Expansion Packs
+
+Five independently removable expansions turn the collection into a complete environment:
+
+| Pack | Effect |
+| --- | --- |
+| [Temporal Rift](expansion-packs/temporal-rift/README.md) | Dawn, day, dusk, and midnight wallpaper grades with scheduled display temperature |
+| [Kinetic Architecture](expansion-packs/kinetic-architecture/README.md) | A distinct Hyprland animation language for every world |
+| [Dreamscapes HUD](expansion-packs/dreamscapes-hud/README.md) | Animated bar identity, phase, time, and direct world controls |
+| [Dream Terminal](expansion-packs/dream-terminal/README.md) | Theme-aware Fastfetch artifacts and a Starship world/phase module |
+| [Ritual Boot](expansion-packs/ritual-boot/README.md) | Transparent unlock emblems and matching Plymouth previews |
+
+Install all five after reviewing the scripts:
+
+```bash
+./expansion-packs/install-all
+```
+
+Remove all five in reverse order:
+
+```bash
+./expansion-packs/uninstall-all
+```
+
+Each pack also has its own installer and uninstaller. No GitHub Actions workflows or background network services are included; Temporal Rift uses only a local user-level systemd timer.
+
 ## Compatibility
 
 Developed and locally tested with Omarchy 4.0.0-1. The repositories use the modern `colors.toml` theme format.

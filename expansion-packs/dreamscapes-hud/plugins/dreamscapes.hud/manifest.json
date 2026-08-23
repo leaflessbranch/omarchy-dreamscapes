@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "dreamscapes.hud",
+  "name": "Dreamscapes HUD",
+  "version": "2.0.0",
+  "author": "Eddie (leaflessbranch)",
+  "description": "Animated theme identity, temporal phase, and clock instrument",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Hud.qml"
+  },
+  "barWidget": {
+    "displayName": "Dreamscapes HUD",
+    "description": "Animated theme identity, temporal phase, and clock instrument",
+    "category": "System",
+    "allowMultiple": false,
+    "defaultSection": "left"
+  }
+}

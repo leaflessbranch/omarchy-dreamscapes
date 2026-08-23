@@ -1,0 +1,106 @@
+#!/bin/bash
+
+set -euo pipefail
+
+theme_file="$HOME/.local/state/omarchy/current/theme.name"
+
+animate() {
+  local leaf=$1 speed=$2 curve=$3 style=${4:-}
+  local expression
+  if [[ -n $style ]]; then
+    expression="hl.animation({ leaf = \"$leaf\", enabled = true, speed = $speed, bezier = \"$curve\", style = \"$style\" })"
+  else
+    expression="hl.animation({ leaf = \"$leaf\", enabled = true, speed = $speed, bezier = \"$curve\" })"
+  fi
+  hyprctl eval "$expression" >/dev/null
+}
+
+apply_profile() {
+  local theme=${1:-}
+  [[ -n $theme ]] || { [[ -f $theme_file ]] && theme=$(<"$theme_file"); }
+  command -v hyprctl >/dev/null || return 0
+
+  local curve=easeOutQuint windows_in=4.1 windows_out=1.49 window_style='popin 87%'
+  local workspace_speed=4 workspace_style=slidevert fade_speed=3.03 layer_speed=3.81
+
+  case "$theme" in
+    abyssal-cartographer)
+      curve=easeInOutCubic; windows_in=5.8; windows_out=3.2; window_style='popin 78%'
+      workspace_speed=5.2; workspace_style=slide; fade_speed=4.8; layer_speed=4.6
+      ;;
+    xenobotany-lab-no-7)
+      curve=quick; windows_in=4.4; windows_out=2.4; window_style='popin 92%'
+      workspace_speed=4.0; workspace_style=slide; fade_speed=4.2; layer_speed=4.0
+      ;;
+    solar-relic)
+      curve=easeOutQuint; windows_in=3.6; windows_out=2.2; window_style=slide
+      workspace_speed=3.4; workspace_style=slide; fade_speed=3.0; layer_speed=3.2
+      ;;
+    dream-bureaucracy)
+      curve=almostLinear; windows_in=5.2; windows_out=4.2; window_style=slide
+      workspace_speed=5.0; workspace_style=slide; fade_speed=5.0; layer_speed=4.8
+      ;;
+    cathedral-of-static)
+      curve=quick; windows_in=3.1; windows_out=1.8; window_style='popin 70%'
+      workspace_speed=3.0; workspace_style=slidevert; fade_speed=2.2; layer_speed=2.6
+      ;;
+    cryogenic-orchard)
+      curve=easeInOutCubic; windows_in=6.2; windows_out=4.0; window_style='popin 94%'
+      workspace_speed=5.8; workspace_style=slide; fade_speed=5.6; layer_speed=5.4
+      ;;
+    apollo-after-dark)
+      curve=quick; windows_in=3.0; windows_out=1.6; window_style=slide
+      workspace_speed=2.8; workspace_style=slide; fade_speed=2.6; layer_speed=2.8
+      ;;
+    living-ink)
+      curve=easeInOutCubic; windows_in=6.5; windows_out=5.0; window_style='popin 99%'
+      workspace_speed=6.0; workspace_style=fade; fade_speed=6.2; layer_speed=5.8
+      ;;
+    neon-fossil)
+      curve=quick; windows_in=3.4; windows_out=1.9; window_style='popin 84%'
+      workspace_speed=3.2; workspace_style=slide; fade_speed=2.9; layer_speed=3.0
+      ;;
+    the-impossible-hotel)
+      curve=easeInOutCubic; windows_in=5.0; windows_out=3.6; window_style=slidevert
+      workspace_speed=4.6; workspace_style=slidevert; fade_speed=4.2; layer_speed=4.5
+      ;;
+    *) restore_defaults; echo "Kinetic Architecture restored for non-Dreamscapes theme: ${theme:-unknown}"; return 0 ;;
+  esac
+
+  animate windows "$windows_in" "$curve"
+  animate windowsIn "$windows_in" "$curve" "$window_style"
+  animate windowsOut "$windows_out" "$curve" "$window_style"
+  animate fade "$fade_speed" "$curve"
+  animate layers "$layer_speed" "$curve"
+  animate layersIn "$layer_speed" "$curve" fade
+  animate layersOut "$windows_out" "$curve" fade
+  animate workspaces "$workspace_speed" "$curve" "$workspace_style"
+  animate specialWorkspace "$workspace_speed" "$curve" "$workspace_style"
+  echo "$theme · $window_style · $workspace_style"
+}
+
+restore_defaults() {
+  command -v hyprctl >/dev/null || return 0
+  animate border 5.39 easeOutQuint
+  animate windows 3.79 easeOutQuint
+  animate windowsIn 4.1 easeOutQuint 'popin 87%'
+  animate windowsOut 1.49 linear 'popin 87%'
+  animate fadeIn 1.73 almostLinear
+  animate fadeOut 1.46 almostLinear
+  animate fade 3.03 quick
+  hyprctl eval 'hl.animation({ leaf = "fadeSwitch", enabled = false })' >/dev/null
+  animate layers 3.81 easeOutQuint
+  animate layersIn 4 easeOutQuint fade
+  animate layersOut 1.5 linear fade
+  animate fadeLayersIn 1.79 almostLinear
+  animate fadeLayersOut 1.39 almostLinear
+  hyprctl eval 'hl.animation({ leaf = "workspaces", enabled = false })' >/dev/null
+  animate specialWorkspace 3 easeOutQuint slidevert
+}
+
+case "${1:-apply}" in
+  apply) apply_profile "${2:-}" ;;
+  restore) restore_defaults; echo "Omarchy animation defaults restored." ;;
+  status) [[ -f $theme_file ]] && apply_profile "$(<"$theme_file")" || echo "No active Omarchy theme." ;;
+  *) echo "Usage: dreamscapes-kinetic {apply [theme]|restore|status}" >&2; exit 1 ;;
+esac

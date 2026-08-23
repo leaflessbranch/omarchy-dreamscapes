@@ -1,0 +1,24 @@
+#!/bin/bash
+
+theme_file="$HOME/.local/state/omarchy/current/theme.name"
+phase_file="$HOME/.local/state/omarchy-dreamscapes/temporal.phase"
+theme=unknown
+phase=static
+[[ -f $theme_file ]] && theme=$(<"$theme_file")
+[[ -f $phase_file ]] && phase=$(<"$phase_file")
+
+case "$theme" in
+  abyssal-cartographer) sigil='⌖'; code=ABYSS ;;
+  xenobotany-lab-no-7) sigil='⚗'; code=XENO-7 ;;
+  solar-relic) sigil='☉'; code=RELIC ;;
+  dream-bureaucracy) sigil='▤'; code=FORM-9 ;;
+  cathedral-of-static) sigil='⌁'; code=NAVE ;;
+  cryogenic-orchard) sigil='❄'; code=ORCHARD ;;
+  apollo-after-dark) sigil='◐'; code=APOLLO ;;
+  living-ink) sigil='◒'; code=INK ;;
+  neon-fossil) sigil='◉'; code=FOSSIL ;;
+  the-impossible-hotel) sigil='⌑'; code='ROOM-∞' ;;
+  *) sigil='◇'; code=STATIC ;;
+esac
+
+printf '%s %s·%s' "$sigil" "$code" "${phase^^}"
