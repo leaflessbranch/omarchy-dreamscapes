@@ -1,0 +1,11 @@
+#!/bin/bash
+
+profile="$HOME/.config/omarchy/hooks/theme-set.d/dreamscapes-profile"
+[[ -x $profile ]] || exit 0
+
+theme_name=""
+if [[ -f $HOME/.local/state/omarchy/current/theme.name ]]; then
+  theme_name=$(<"$HOME/.local/state/omarchy/current/theme.name")
+fi
+
+"$profile" "$theme_name"

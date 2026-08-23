@@ -1,0 +1,29 @@
+#!/bin/bash
+
+themes=(
+  abyssal-cartographer
+  xenobotany-lab-no-7
+  solar-relic
+  dream-bureaucracy
+  cathedral-of-static
+  cryogenic-orchard
+  apollo-after-dark
+  living-ink
+  neon-fossil
+  the-impossible-hotel
+)
+
+current=""
+if [[ -f $HOME/.local/state/omarchy/current/theme.name ]]; then
+  current=$(<"$HOME/.local/state/omarchy/current/theme.name")
+fi
+
+next=0
+for index in "${!themes[@]}"; do
+  if [[ ${themes[$index]} == "$current" ]]; then
+    next=$(((index + 1) % ${#themes[@]}))
+    break
+  fi
+done
+
+exec omarchy theme set "${themes[$next]}"

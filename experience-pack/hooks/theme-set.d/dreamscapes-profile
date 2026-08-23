@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# Runtime Hyprland profile for the ten Omarchy Dreamscapes themes.
+# Stock themes are returned to Omarchy's default geometry and opacity.
+
+theme_name=${1:-}
+if [[ -z $theme_name && -f $HOME/.local/state/omarchy/current/theme.name ]]; then
+  theme_name=$(<"$HOME/.local/state/omarchy/current/theme.name")
+fi
+
+gaps_in=5
+gaps_out=10
+border_size=2
+rounding=0
+blur_enabled=false
+blur_size=8
+blur_passes=1
+active_opacity=1.0
+inactive_opacity=1.0
+
+case "$theme_name" in
+  abyssal-cartographer)
+    gaps_in=4; gaps_out=12; border_size=2; rounding=10
+    blur_enabled=true; blur_size=8; blur_passes=2
+    active_opacity=0.97; inactive_opacity=0.93
+    ;;
+  xenobotany-lab-no-7)
+    gaps_in=5; gaps_out=12; border_size=3; rounding=6
+    blur_enabled=true; blur_size=10; blur_passes=2
+    active_opacity=0.98; inactive_opacity=0.94
+    ;;
+  solar-relic)
+    gaps_in=3; gaps_out=14; border_size=2; rounding=0
+    blur_enabled=false
+    active_opacity=1.0; inactive_opacity=0.98
+    ;;
+  dream-bureaucracy)
+    gaps_in=6; gaps_out=16; border_size=1; rounding=4
+    blur_enabled=false
+    active_opacity=1.0; inactive_opacity=1.0
+    ;;
+  cathedral-of-static)
+    gaps_in=4; gaps_out=14; border_size=3; rounding=0
+    blur_enabled=true; blur_size=6; blur_passes=2
+    active_opacity=0.98; inactive_opacity=0.94
+    ;;
+  cryogenic-orchard)
+    gaps_in=7; gaps_out=18; border_size=2; rounding=16
+    blur_enabled=true; blur_size=12; blur_passes=2
+    active_opacity=0.98; inactive_opacity=0.95
+    ;;
+  apollo-after-dark)
+    gaps_in=3; gaps_out=10; border_size=2; rounding=2
+    blur_enabled=false
+    active_opacity=0.99; inactive_opacity=0.96
+    ;;
+  living-ink)
+    gaps_in=8; gaps_out=20; border_size=1; rounding=0
+    blur_enabled=false
+    active_opacity=1.0; inactive_opacity=1.0
+    ;;
+  neon-fossil)
+    gaps_in=4; gaps_out=12; border_size=3; rounding=8
+    blur_enabled=true; blur_size=7; blur_passes=2
+    active_opacity=0.98; inactive_opacity=0.94
+    ;;
+  the-impossible-hotel)
+    gaps_in=6; gaps_out=16; border_size=2; rounding=12
+    blur_enabled=true; blur_size=10; blur_passes=2
+    active_opacity=0.97; inactive_opacity=0.93
+    ;;
+esac
+
+command -v hyprctl >/dev/null 2>&1 || exit 0
+
+hyprctl eval "hl.config({ general = { gaps_in = $gaps_in, gaps_out = $gaps_out, border_size = $border_size }, decoration = { rounding = $rounding, active_opacity = $active_opacity, inactive_opacity = $inactive_opacity, blur = { enabled = $blur_enabled, size = $blur_size, passes = $blur_passes } } })" >/dev/null

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -euo pipefail
+
+shell_config="$HOME/.config/omarchy/shell.json"
+bindings="$HOME/.config/hypr/bindings.lua"
+plugin_dir="$HOME/.config/omarchy/plugins/dreamscapes.workspaces"
+theme_hook="$HOME/.config/omarchy/hooks/theme-set.d/dreamscapes-profile"
+boot_hook="$HOME/.config/omarchy/hooks/post-boot.d/dreamscapes-profile"
+cycle_command="$HOME/.local/bin/omarchy-theme-cycle-dreamscapes"
+
+if [[ -f $shell_config ]] && command -v jq >/dev/null; then
+  shell_tmp=$(mktemp)
+  jq 'walk(if type == "object" and .id? == "dreamscapes.workspaces" then .id = "omarchy.workspaces" else . end)' "$shell_config" > "$shell_tmp"
+  install -m 644 "$shell_tmp" "$shell_config"
+  rm -f "$shell_tmp"
+fi
+
+if [[ -f $bindings ]]; then
+  bindings_tmp=$(mktemp)
+  sed '/# BEGIN OMARCHY DREAMSCAPES/,/# END OMARCHY DREAMSCAPES/d' "$bindings" > "$bindings_tmp"
+  install -m 644 "$bindings_tmp" "$bindings"
+  rm -f "$bindings_tmp"
+fi
+
+rm -rf -- "$plugin_dir"
+rm -f -- "$theme_hook" "$boot_hook" "$cycle_command"
+
+omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
+hyprctl reload >/dev/null 2>&1 || true
+
+echo "Dreamscapes Experience Pack removed. Backups were retained."

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -euo pipefail
+
+themes=(
+  abyssal-cartographer
+  xenobotany-lab-no-7
+  solar-relic
+  dream-bureaucracy
+  cathedral-of-static
+  cryogenic-orchard
+  apollo-after-dark
+  living-ink
+  neon-fossil
+  the-impossible-hotel
+)
+
+for theme in "${themes[@]}"; do
+  omarchy theme install "https://github.com/leaflessbranch/omarchy-${theme}-theme.git"
+done
+
+echo "Installed all ten Omarchy Dreamscapes themes."
