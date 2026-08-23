@@ -4,6 +4,7 @@ set -euo pipefail
 
 omarchy plugin disable dreamscapes.hud >/dev/null 2>&1 || true
 rm -rf -- "$HOME/.config/omarchy/plugins/dreamscapes.hud"
+rm -f -- "$HOME/.local/bin/dreamscapes-hud-control"
 omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
 
 echo "Dreamscapes HUD Pack removed."

@@ -91,8 +91,8 @@ BarWidget {
 
     onPressed: function(mouseButton) {
       if (!root.bar) return
-      if (mouseButton === Qt.RightButton) root.bar.run("dreamscapes-temporal cycle")
-      else if (mouseButton === Qt.MiddleButton) root.bar.run("omarchy-theme-cycle-dreamscapes")
+      if (mouseButton === Qt.RightButton) root.bar.run("dreamscapes-hud-control phase")
+      else if (mouseButton === Qt.MiddleButton) root.bar.run("dreamscapes-hud-control theme")
       else root.bar.run("omarchy theme switcher")
     }
   }

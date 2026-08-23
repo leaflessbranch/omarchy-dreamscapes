@@ -3,8 +3,8 @@
 A theme-aware Omarchy bar instrument showing the active world, temporal phase, and local time through a compact animated identity strip.
 
 - Left click opens the Omarchy theme switcher.
-- Middle click advances to the next Dreamscapes theme.
-- Right click advances the Temporal Rift phase.
+- Middle click advances to the next Dreamscapes theme using the HUD's self-contained controller.
+- Right click advances the Temporal Rift phase when that pack is installed.
 
 Temporal phase information appears automatically when the Temporal Rift Pack is installed; otherwise the HUD displays `static`.
 

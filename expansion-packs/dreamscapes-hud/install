@@ -4,11 +4,13 @@ set -euo pipefail
 
 pack_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 plugin_dir="$HOME/.config/omarchy/plugins/dreamscapes.hud"
+control_path="$HOME/.local/bin/dreamscapes-hud-control"
 
 command -v omarchy >/dev/null || { echo "Omarchy is required." >&2; exit 1; }
-mkdir -p "$plugin_dir"
+mkdir -p "$plugin_dir" "$(dirname "$control_path")"
 cp "$pack_dir/plugins/dreamscapes.hud/manifest.json" "$plugin_dir/manifest.json"
 cp "$pack_dir/plugins/dreamscapes.hud/Hud.qml" "$plugin_dir/Hud.qml"
+install -m 755 "$pack_dir/bin/dreamscapes-hud-control" "$control_path"
 
 omarchy plugin validate "$plugin_dir"
 omarchy-shell shell rescanPlugins

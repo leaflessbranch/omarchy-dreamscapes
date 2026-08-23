@@ -1,0 +1,42 @@
+#!/bin/bash
+
+set -euo pipefail
+
+themes=(
+  abyssal-cartographer
+  xenobotany-lab-no-7
+  solar-relic
+  dream-bureaucracy
+  cathedral-of-static
+  cryogenic-orchard
+  apollo-after-dark
+  living-ink
+  neon-fossil
+  the-impossible-hotel
+)
+
+cycle_theme() {
+  local theme_file="$HOME/.local/state/omarchy/current/theme.name"
+  local current= next=0 index
+  [[ -f $theme_file ]] && current=$(<"$theme_file")
+  for index in "${!themes[@]}"; do
+    if [[ ${themes[$index]} == "$current" ]]; then
+      next=$(((index + 1) % ${#themes[@]}))
+      break
+    fi
+  done
+  omarchy theme set "${themes[$next]}"
+}
+
+case "${1:-}" in
+  theme) cycle_theme ;;
+  phase)
+    if command -v dreamscapes-temporal >/dev/null 2>&1; then
+      dreamscapes-temporal cycle
+    else
+      echo "Install the Temporal Rift Pack to cycle phases." >&2
+      exit 1
+    fi
+    ;;
+  *) echo "Usage: dreamscapes-hud-control {theme|phase}" >&2; exit 1 ;;
+esac
