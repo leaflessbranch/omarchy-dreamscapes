@@ -15,6 +15,15 @@ themes=(
   the-impossible-hotel
 )
 
+select_theme() {
+  local selected
+
+  selected=$(omarchy theme switcher)
+  if [[ -n $selected ]]; then
+    omarchy theme set "$selected"
+  fi
+}
+
 cycle_theme() {
   local theme_file="$HOME/.local/state/omarchy/current/theme.name"
   local current= next=0 index
@@ -29,6 +38,7 @@ cycle_theme() {
 }
 
 case "${1:-}" in
+  select) select_theme ;;
   theme) cycle_theme ;;
   phase)
     if command -v dreamscapes-temporal >/dev/null 2>&1; then
@@ -38,5 +48,5 @@ case "${1:-}" in
       exit 1
     fi
     ;;
-  *) echo "Usage: dreamscapes-hud-control {theme|phase}" >&2; exit 1 ;;
+  *) echo "Usage: dreamscapes-hud-control {select|theme|phase}" >&2; exit 1 ;;
 esac

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "dreamscapes.hud",
   "name": "Dreamscapes HUD",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": "Eddie (leaflessbranch)",
   "description": "Animated theme identity, temporal phase, and clock instrument",
   "kinds": [
