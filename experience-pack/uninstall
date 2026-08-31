@@ -17,10 +17,23 @@ if [[ -f $shell_config ]] && command -v jq >/dev/null; then
 fi
 
 if [[ -f $bindings ]]; then
-  bindings_tmp=$(mktemp)
-  sed '/# BEGIN OMARCHY DREAMSCAPES/,/# END OMARCHY DREAMSCAPES/d' "$bindings" > "$bindings_tmp"
-  install -m 644 "$bindings_tmp" "$bindings"
-  rm -f "$bindings_tmp"
+  begin=$(grep -n -m1 -F '# BEGIN OMARCHY DREAMSCAPES' "$bindings" || true)
+  end=$(grep -n -m1 -F '# END OMARCHY DREAMSCAPES' "$bindings" || true)
+  begin=${begin%%:*}
+  end=${end%%:*}
+
+  if [[ -n $begin && -n $end && $begin -le $end ]]; then
+    # The installer writes a blank separator line before the block; take it too
+    # so removal restores the file exactly as it was.
+    if [[ $begin -gt 1 && -z $(sed -n "$((begin - 1))p" "$bindings") ]]; then
+      begin=$((begin - 1))
+    fi
+
+    bindings_tmp=$(mktemp)
+    sed "${begin},${end}d" "$bindings" > "$bindings_tmp"
+    install -m 644 "$bindings_tmp" "$bindings"
+    rm -f "$bindings_tmp"
+  fi
 fi
 
 rm -rf -- "$plugin_dir"

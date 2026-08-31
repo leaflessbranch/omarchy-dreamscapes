@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -euo pipefail
+
+repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+test_root=$(mktemp -d)
+trap 'rm -rf -- "$test_root"' EXIT
+
+export HOME="$test_root/home"
+stub_dir="$test_root/bin"
+shell_config="$HOME/.config/omarchy/shell.json"
+bindings="$HOME/.config/hypr/bindings.lua"
+plugin_dir="$HOME/.config/omarchy/plugins/dreamscapes.workspaces"
+theme_hook="$HOME/.config/omarchy/hooks/theme-set.d/dreamscapes-profile"
+boot_hook="$HOME/.config/omarchy/hooks/post-boot.d/dreamscapes-profile"
+cycle_command="$HOME/.local/bin/omarchy-theme-cycle-dreamscapes"
+
+mkdir -p \
+  "$stub_dir" \
+  "$plugin_dir" \
+  "$(dirname -- "$bindings")" \
+  "$(dirname -- "$shell_config")" \
+  "$(dirname -- "$theme_hook")" \
+  "$(dirname -- "$boot_hook")" \
+  "$(dirname -- "$cycle_command")"
+
+printf '#!/bin/sh\nexit 0\n' > "$stub_dir/omarchy-shell"
+printf '#!/bin/sh\nexit 0\n' > "$stub_dir/hyprctl"
+chmod +x "$stub_dir/omarchy-shell" "$stub_dir/hyprctl"
+export PATH="$stub_dir:$PATH"
+
+printf '%s\n' '{"widgets":[{"id":"dreamscapes.workspaces"}],"label":"Dreamscapes — test"}' > "$shell_config"
+printf '%s\n' 'o.bind("SUPER", "Unrelated binding", "true")' > "$bindings"
+cp "$bindings" "$test_root/bindings.before"
+touch "$plugin_dir/manifest.json" "$theme_hook" "$boot_hook" "$cycle_command"
+
+"$repo_root/experience-pack/uninstall" >/dev/null
+
+cmp -s "$test_root/bindings.before" "$bindings"
+jq -e '.widgets[0].id == "omarchy.workspaces"' "$shell_config" >/dev/null
+grep -Fq 'Dreamscapes — test' "$shell_config"
+[[ ! -e $plugin_dir ]]
+[[ ! -e $theme_hook ]]
+[[ ! -e $boot_hook ]]
+[[ ! -e $cycle_command ]]
+
+echo "experience-pack markerless uninstall: ok"

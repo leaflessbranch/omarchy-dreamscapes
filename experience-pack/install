@@ -29,11 +29,17 @@ jq 'walk(if type == "object" and (.id? | type) == "string" and (.id | test("(^|\
 install -m 644 "$shell_tmp" "$shell_config"
 rm -f "$shell_tmp"
 
+# Repair markers written by earlier versions: bindings.lua is Lua, where a bare
+# '#' is the length operator rather than a comment. The '--#' form keeps the
+# '# BEGIN/END OMARCHY DREAMSCAPES' text that the guard below and the
+# uninstaller match on, while making the line a valid Lua comment.
+sed -i -E 's/^# ((BEGIN|END) OMARCHY DREAMSCAPES)$/--# \1/' "$bindings"
+
 if ! grep -Fq '# BEGIN OMARCHY DREAMSCAPES' "$bindings"; then
   printf '\n%s\n%s\n%s\n' \
-    '# BEGIN OMARCHY DREAMSCAPES' \
+    '--# BEGIN OMARCHY DREAMSCAPES' \
     'o.bind("SUPER + SHIFT + CTRL + T", "Cycle Dreamscapes theme", os.getenv("HOME") .. "/.local/bin/omarchy-theme-cycle-dreamscapes")' \
-    '# END OMARCHY DREAMSCAPES' >> "$bindings"
+    '--# END OMARCHY DREAMSCAPES' >> "$bindings"
 fi
 
 omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
