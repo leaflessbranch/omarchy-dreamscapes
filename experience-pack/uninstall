@@ -11,14 +11,16 @@ cycle_command="$HOME/.local/bin/omarchy-theme-cycle-dreamscapes"
 
 if [[ -f $shell_config ]] && command -v jq >/dev/null; then
   shell_tmp=$(mktemp)
-  jq -a 'walk(if type == "object" and .id? == "dreamscapes.workspaces" then .id = "omarchy.workspaces" else . end)' "$shell_config" > "$shell_tmp"
+  jq 'walk(if type == "object" and .id? == "dreamscapes.workspaces" then .id = "omarchy.workspaces" else . end)' "$shell_config" > "$shell_tmp"
   install -m 644 "$shell_tmp" "$shell_config"
   rm -f "$shell_tmp"
 fi
 
 if [[ -f $bindings ]]; then
-  begin=$(grep -n '# BEGIN OMARCHY DREAMSCAPES' "$bindings" | head -1 | cut -d: -f1)
-  end=$(grep -n '# END OMARCHY DREAMSCAPES' "$bindings" | head -1 | cut -d: -f1)
+  begin=$(grep -n -m1 -F '# BEGIN OMARCHY DREAMSCAPES' "$bindings" || true)
+  end=$(grep -n -m1 -F '# END OMARCHY DREAMSCAPES' "$bindings" || true)
+  begin=${begin%%:*}
+  end=${end%%:*}
 
   if [[ -n $begin && -n $end && $begin -le $end ]]; then
     # The installer writes a blank separator line before the block; take it too

@@ -25,7 +25,7 @@ omarchy hook install theme-set "$pack_dir/hooks/theme-set.d/dreamscapes-profile"
 omarchy hook install post-boot "$pack_dir/hooks/post-boot.d/dreamscapes-profile"
 
 shell_tmp=$(mktemp)
-jq -a 'walk(if type == "object" and (.id? | type) == "string" and (.id | test("(^|\\.)workspaces$")) then .id = "dreamscapes.workspaces" else . end)' "$shell_config" > "$shell_tmp"
+jq 'walk(if type == "object" and (.id? | type) == "string" and (.id | test("(^|\\.)workspaces$")) then .id = "dreamscapes.workspaces" else . end)' "$shell_config" > "$shell_tmp"
 install -m 644 "$shell_tmp" "$shell_config"
 rm -f "$shell_tmp"
 
