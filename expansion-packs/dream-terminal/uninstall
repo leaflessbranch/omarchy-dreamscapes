@@ -5,7 +5,8 @@ set -euo pipefail
 starship_config="$HOME/.config/starship.toml"
 if [[ -f $starship_config ]]; then
   temporary=$(mktemp)
-  sed '/# BEGIN OMARCHY DREAMSCAPES TERMINAL/,/# END OMARCHY DREAMSCAPES TERMINAL/d' "$starship_config" > "$temporary"
+  sed -e '/# BEGIN OMARCHY DREAMSCAPES TERMINAL/,/# END OMARCHY DREAMSCAPES TERMINAL/d' \
+    -e 's/\${custom\.dreamscapes}//g' "$starship_config" > "$temporary"
   install -m 644 "$temporary" "$starship_config"
   rm -f "$temporary"
 fi

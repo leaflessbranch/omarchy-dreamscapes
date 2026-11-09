@@ -4,7 +4,7 @@ Theme-aware terminal identity for Dreamscapes:
 
 - `dreamfetch` runs Fastfetch with a different original ASCII artifact for each world and the active theme accent.
 - `dreamscapes-prompt` supplies a compact world/phase indicator.
-- A guarded Starship custom module adds that indicator to the prompt while retaining the user's existing configuration.
+- A guarded Starship custom module adds that indicator to the prompt on Dreamscapes worlds while retaining the user's existing configuration. A custom single-line top-level `format` gets `${custom.dreamscapes}` prepended; uninstalling removes it again.
 
 ## Install
 

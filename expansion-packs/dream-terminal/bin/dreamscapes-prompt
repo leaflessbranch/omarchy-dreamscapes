@@ -18,7 +18,8 @@ case "$theme" in
   living-ink) sigil='◒'; code=INK ;;
   neon-fossil) sigil='◉'; code=FOSSIL ;;
   the-impossible-hotel) sigil='⌑'; code='ROOM-∞' ;;
-  *) sigil='◇'; code=STATIC ;;
+  # Not a Dreamscapes world: fail so Starship's `when` hides the module.
+  *) exit 1 ;;
 esac
 
 printf '%s %s·%s' "$sigil" "$code" "${phase^^}"

@@ -25,10 +25,16 @@ if ! grep -Fq '# BEGIN OMARCHY DREAMSCAPES TERMINAL' "$starship_config"; then
     '# BEGIN OMARCHY DREAMSCAPES TERMINAL' \
     '[custom.dreamscapes]' \
     'command = "dreamscapes-prompt"' \
-    'when = true' \
+    'when = "dreamscapes-prompt"' \
     'format = "[$output]($style) "' \
     'style = "bold cyan"' \
     '# END OMARCHY DREAMSCAPES TERMINAL' >> "$starship_config"
+fi
+
+# Starship draws only the modules a top-level `format` names, so add the
+# indicator to a custom single-line format (one ending at the first table).
+if ! grep -Fq '${custom.dreamscapes}' "$starship_config"; then
+  sed -i -E "0,/^\[/s/^(format[[:space:]]*=[[:space:]]*)([\"'])([^\"'])/\1\2\${custom.dreamscapes}\3/" "$starship_config"
 fi
 
 echo "Dream Terminal Pack installed. Run: dreamfetch"

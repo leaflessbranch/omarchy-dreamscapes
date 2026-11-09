@@ -1,0 +1,42 @@
+#!/bin/bash
+
+set -euo pipefail
+
+repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+test_root=$(mktemp -d)
+trap 'rm -rf -- "$test_root"' EXIT
+
+export HOME="$test_root/home"
+stub_dir="$test_root/bin"
+starship_config="$HOME/.config/starship.toml"
+theme_file="$HOME/.local/state/omarchy/current/theme.name"
+prompt="$HOME/.local/bin/dreamscapes-prompt"
+
+mkdir -p "$stub_dir" "$(dirname -- "$starship_config")" "$(dirname -- "$theme_file")"
+
+printf '#!/bin/sh\nexit 0\n' > "$stub_dir/fastfetch"
+chmod +x "$stub_dir/fastfetch"
+export PATH="$stub_dir:$PATH"
+
+# A user prompt with its own top-level format: Starship shows only the modules it names.
+printf '%s\n' 'format = "$directory$character"' '' '[character]' 'success_symbol = "❯"' > "$starship_config"
+
+"$repo_root/expansion-packs/dream-terminal/install" >/dev/null
+"$repo_root/expansion-packs/dream-terminal/install" >/dev/null
+
+grep -Fxq 'format = "${custom.dreamscapes}$directory$character"' "$starship_config"
+[[ $(grep -Fc '# BEGIN OMARCHY DREAMSCAPES TERMINAL' "$starship_config") -eq 1 ]]
+
+# The indicator shows on a Dreamscapes world and fails (so `when` hides it) elsewhere.
+printf '%s\n' 'solar-relic' > "$theme_file"
+[[ $("$prompt") == '☉ RELIC·STATIC' ]]
+printf '%s\n' 'tokyo-night' > "$theme_file"
+if output=$("$prompt"); then exit 1; fi
+[[ -z $output ]]
+
+"$repo_root/expansion-packs/dream-terminal/uninstall" >/dev/null
+
+grep -Fxq 'format = "$directory$character"' "$starship_config"
+[[ $(grep -Fc 'dreamscapes' "$starship_config") -eq 0 ]]
+
+echo "dream-terminal custom starship format: ok"
