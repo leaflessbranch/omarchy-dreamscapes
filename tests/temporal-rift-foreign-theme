@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -euo pipefail
+
+repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+test_root=$(mktemp -d)
+trap 'rm -rf -- "$test_root"' EXIT
+
+export HOME="$test_root/home"
+stub_dir="$test_root/bin"
+hyprctl_log="$test_root/hyprctl.log"
+theme_file="$HOME/.local/state/omarchy/current/theme.name"
+phase_file="$HOME/.local/state/omarchy-dreamscapes/temporal.phase"
+
+mkdir -p "$stub_dir" "$(dirname -- "$theme_file")" "$(dirname -- "$phase_file")"
+
+printf '#!/bin/sh\necho "$*" >> "%s"\n' "$hyprctl_log" > "$stub_dir/hyprctl"
+printf '#!/bin/sh\nexit 0\n' > "$stub_dir/omarchy"
+chmod +x "$stub_dir/hyprctl" "$stub_dir/omarchy"
+export PATH="$stub_dir:$PATH"
+
+# A Temporal Rift tint is active, then the user switches to a stock theme.
+printf '%s\n' 'tokyo-night' > "$theme_file"
+printf '%s\n' 'midnight' > "$phase_file"
+
+"$repo_root/expansion-packs/temporal-rift/bin/dreamscapes-temporal" apply auto >/dev/null
+
+grep -Fxq 'hyprsunset identity' "$hyprctl_log"
+[[ ! -e $phase_file ]]
+
+# Later timer ticks must leave the display temperature alone.
+: > "$hyprctl_log"
+"$repo_root/expansion-packs/temporal-rift/bin/dreamscapes-temporal" apply auto >/dev/null
+[[ ! -s $hyprctl_log ]]
+
+echo "temporal-rift foreign theme clears tint: ok"

@@ -58,7 +58,15 @@ apply_phase() {
   local theme phase background temperature
   [[ -f $theme_file ]] || { echo "No active Omarchy theme." >&2; return 1; }
   theme=$(<"$theme_file")
-  supported_theme "$theme" || { echo "Temporal Rift is inactive for theme: $theme"; return 0; }
+  if ! supported_theme "$theme"; then
+    # Clear a tint left over from a Dreamscapes theme, but never touch one the user set.
+    if [[ -f $phase_file ]]; then
+      command -v hyprctl >/dev/null 2>&1 && { hyprctl hyprsunset identity >/dev/null 2>&1 || true; }
+      rm -f -- "$phase_file"
+    fi
+    echo "Temporal Rift is inactive for theme: $theme"
+    return 0
+  fi
 
   if [[ $requested == auto ]]; then
     phase=$(phase_for_hour)
