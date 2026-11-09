@@ -35,9 +35,12 @@ BarWidget {
     case "the-impossible-hotel":
       return ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]
     default:
-      return ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+      return null
     }
   }
+
+  // Stock themes get the stock omarchy.workspaces look.
+  readonly property bool dreamscape: labelsForTheme(themeName) !== null
 
   function labelFor(id) {
     var labels = labelsForTheme(themeName)
@@ -104,14 +107,15 @@ BarWidget {
         readonly property bool focused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === modelData
 
         bar: root.bar
-        text: root.labelFor(modelData)
-        active: focused
+        text: root.dreamscape ? root.labelFor(modelData) : (focused ? "\uDB85\uDCFB" : (modelData === 10 ? "0" : String(modelData)))
+        opacity: root.dreamscape || occupied || focused ? 1 : 0.5
+        active: root.dreamscape && focused
         activeColor: Color.accent
-        dimmed: !(occupied || focused)
-        tooltipText: "Workspace " + modelData + " · " + root.themeName.replace(/-/g, " ")
+        dimmed: root.dreamscape && !(occupied || focused)
+        tooltipText: root.dreamscape ? "Workspace " + modelData + " · " + root.themeName.replace(/-/g, " ") : ""
         horizontalMargin: 6
         verticalPadding: 6
-        fixedWidth: root.vertical ? root.barSize : Style.space(28)
+        fixedWidth: root.vertical ? root.barSize : Style.space(root.dreamscape ? 28 : 20)
         fixedHeight: root.barSize
         onPressed: function() { root.focusWorkspace(modelData) }
       }

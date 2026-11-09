@@ -4,7 +4,7 @@ An optional companion for the ten Omarchy Dreamscapes themes. The themes themsel
 
 ## What it changes
 
-- Installs `dreamscapes.workspaces`, a theme-aware workspace widget cloned from Omarchy's built-in workspaces plugin.
+- Installs `dreamscapes.workspaces`, a theme-aware workspace widget cloned from Omarchy's built-in workspaces plugin. On non-Dreamscapes themes it looks like the stock widget.
 - Adds theme-set and post-boot hooks that apply theme-specific Hyprland geometry and effects.
 - Installs `~/.local/bin/omarchy-theme-cycle-dreamscapes`.
 - Adds `Super + Shift + Ctrl + T` to the user's Hyprland bindings for cycling the collection.
